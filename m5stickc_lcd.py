@@ -1,6 +1,7 @@
 import framebuf
 import time
 from machine import Pin, SPI, I2C
+from axp192 import AXP192
 
 '''
 import m5stickc_lcd
@@ -37,11 +38,10 @@ class ST7735(framebuf.FrameBuffer):
         self.init_display()
 
     def enable_lcd_power(self):
-        i2c = I2C(1, scl=Pin(22), sda=Pin(21), freq=100000)
-        i2c.writeto_mem(0x34, 0x28, b'\xff')
-        axp192_reg12 = i2c.readfrom_mem(0x34, 0x12, 1)[0]
-        axp192_reg12 |= 0x0c
-        i2c.writeto_mem(0x34, 0x12, bytes([axp192_reg12]))
+        i2c = I2C(0, sda=Pin(21), scl=Pin(22))
+        axp = AXP192(i2c)
+        axp.setup()
+        axp.set_LD02(True)
 
     def init_display(self):
         for cmd, data, delay in [
